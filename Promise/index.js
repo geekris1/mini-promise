@@ -7,16 +7,16 @@ class Promise {
   constructor(executor) {
     this.status = STATUS.PENDING;
     this.value = undefined;
-    const resolve = (reason) => {
+    const resolve = (value) => {
         if (this.status === STATUS.PENDING) {
           this.status = STATUS.FULFILLED;
-          this.value = reason;
+          this.value = value;
         }
       };
-    const reject = (value) => {
+    const reject = (reason) => {
       if (this.status === STATUS.PENDING) {
         this.status = STATUS.REJECTED;
-        this.value = value;
+        this.value = reason;
         throw
       }
     };
