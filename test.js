@@ -1,4 +1,4 @@
 const Promise = require("./Promise");
-new Promise((reject, resolve) => {
-  reject(100);
+new Promise((resolve, reject) => {
+  resolve(100);
 }).then((data) => console.log(data));
