@@ -8,22 +8,22 @@ class Promise {
     this.status = STATUS.PENDING;
     this.value = undefined;
     const resolve = (value) => {
-        if (this.status === STATUS.PENDING) {
-          this.status = STATUS.FULFILLED;
-          this.value = value;
-        }
-      };
+      if (this.status === STATUS.PENDING) {
+        this.status = STATUS.FULFILLED;
+        this.value = value;
+      }
+    };
     const reject = (reason) => {
       if (this.status === STATUS.PENDING) {
         this.status = STATUS.REJECTED;
         this.value = reason;
-        throw
       }
     };
-    try{ executor(resolve, reject)}
-        catch(e){
-            reject(e);
-        }
+    try {
+      executor(resolve, reject);
+    } catch (e) {
+      reject(e);
+    }
   }
   then(onFulfilled, onRejected) {
     if (this.status === STATUS.FULFILLED) {
