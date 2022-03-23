@@ -3,6 +3,31 @@ const STATUS = {
   FULFILLED: "fulfilled",
   REJECTED: "rejected",
 };
+function resolvePromise(promise, x, resolve, reject) {
+  if (promise === x) {
+    return new TypeError("error");
+  }
+  if ((typeof x === "object" && x !== null) || typeof x === "function") {
+    try {
+      const then = x.then;
+      if (typeof then === "function") {
+        then.call(
+          x,
+          (y) => {
+            resolvePromise(promise, y, resolve, reject);
+          },
+          (r) => {
+            reject(r);
+          }
+        );
+      }
+    } catch (e) {
+      reject(e);
+    }
+  } else {
+    resolve(x);
+  }
+}
 class Promise {
   constructor(executor) {
     this.status = STATUS.PENDING;
@@ -36,30 +61,38 @@ class Promise {
       if (this.status === STATUS.FULFILLED) {
         try {
           let x = onFulfilled(this.value);
-          resolve(x);
+          setTimeout(() => {
+            resolvePromise(p1, x, resolve, reject);
+          });
         } catch (e) {
           reject(e);
         }
       } else if (this.status === STATUS.REJECTED) {
         try {
-          let x = onRejected(this.value);
-          reject(x);
+          setTimeout(() => {
+            let x = onRejected(this.value);
+            resolvePromise(p1, x, resolve, reject);
+          });
         } catch (e) {
           reject(e);
         }
       } else if (this.status === STATUS.PENDING) {
         this.onFulfilledCallbacks.push(() => {
           try {
-            let x = onFulfilled(this.value);
-            resolve(x);
+            setTimeout(() => {
+              let x = onFulfilled(this.value);
+              resolvePromise(p1, x, resolve, reject);
+            });
           } catch (e) {
             reject(e);
           }
         });
         this.onRejectedCallbacks.push(() => {
           try {
-            let x = onRejected(this.value);
-            reject(x);
+            setTimeout(() => {
+              let x = onRejected(this.value);
+              resolvePromise(p1, x, resolve, reject);
+            });
           } catch (e) {
             reject(e);
           }
