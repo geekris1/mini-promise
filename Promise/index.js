@@ -7,16 +7,22 @@ class Promise {
   constructor(executor) {
     this.status = STATUS.PENDING;
     this.value = undefined;
+    this.onFulfilledCallbacks = [];
+    this.onRejectedCallbacks = [];
     const resolve = (value) => {
       if (this.status === STATUS.PENDING) {
         this.status = STATUS.FULFILLED;
         this.value = value;
+        this.onFulfilledCallbacks.forEach((x) => {
+          x(this.value);
+        });
       }
     };
     const reject = (reason) => {
       if (this.status === STATUS.PENDING) {
         this.status = STATUS.REJECTED;
         this.value = reason;
+        this.onRejectedCallbacks.forEach((x) => x(this.value));
       }
     };
     try {
@@ -31,7 +37,12 @@ class Promise {
     } else if (this.status === STATUS.REJECTED) {
       onRejected(this.value);
     } else if (this.status === STATUS.PENDING) {
-      // TODO:
+      this.onFulfilledCallbacks.push(() => {
+        onFulfilled(this.value);
+      });
+      this.onRejectedCallbacks.push(() => {
+        onRejected(this.value);
+      });
     }
   }
 }
