@@ -32,18 +32,41 @@ class Promise {
     }
   }
   then(onFulfilled, onRejected) {
-    if (this.status === STATUS.FULFILLED) {
-      onFulfilled(this.value);
-    } else if (this.status === STATUS.REJECTED) {
-      onRejected(this.value);
-    } else if (this.status === STATUS.PENDING) {
-      this.onFulfilledCallbacks.push(() => {
-        onFulfilled(this.value);
-      });
-      this.onRejectedCallbacks.push(() => {
-        onRejected(this.value);
-      });
-    }
+    let p1 = new Promise((resolve, reject) => {
+      if (this.status === STATUS.FULFILLED) {
+        try {
+          let x = onFulfilled(this.value);
+          resolve(x);
+        } catch (e) {
+          reject(e);
+        }
+      } else if (this.status === STATUS.REJECTED) {
+        try {
+          let x = onRejected(this.value);
+          reject(x);
+        } catch (e) {
+          reject(e);
+        }
+      } else if (this.status === STATUS.PENDING) {
+        this.onFulfilledCallbacks.push(() => {
+          try {
+            let x = onFulfilled(this.value);
+            resolve(x);
+          } catch (e) {
+            reject(e);
+          }
+        });
+        this.onRejectedCallbacks.push(() => {
+          try {
+            let x = onRejected(this.value);
+            reject(x);
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+    });
+    return p1;
   }
 }
 
